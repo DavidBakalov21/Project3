@@ -2,19 +2,21 @@ import pgzrun
 from Vector import Vector
 RADIUS=25
 class Platform:
-    def __init__(self):
-        self.actor=Actor('platform.png', center=(300, 550))
+    def __init__(self,vector:Vector):
+        self.position=vector
+        self.velocity=Vector(200,200)
+        #self.actor=Actor('platform.png', center=(300, 550))
     def draw(self):
-        self.actor.draw()
+        screen.draw.filled_rect(Rect((self.position.x, self.position.y),(150,50)), (200, 0, 0))
     def get_position(self):
-        return Vector(self.actor.x, self.actor.y)
+        return Vector(self.position.x, self.position.y)
     def on_mouse_move(self,pos):
-       # print(pos)
-        self.actor.x=pos[0]
-        if self.actor.x>545:
-            self.actor.x=545
-        elif self.actor.x<185:
-            self.actor.x=185
+        print(pos)
+        self.position.x=pos[0]
+        if self.position.x>649:
+            self.position.x=649
+        elif self.position.x<0:
+            self.position.x=0
 
 class Ball():
     def __init__(self, vector:Vector):
@@ -28,7 +30,7 @@ class Ball():
 
 WIDTH = 800
 HEIGHT = 600
-platform=Platform()
+platform=Platform(Vector(300, 450))
 ball=Ball(Vector(90,500))
 #circle=Circle(Vector(200, 200))
 def draw():
@@ -49,7 +51,7 @@ def on_mouse_move(pos):
 def update(dt):
     v=ball.velocity
     distance=(ball.position-platform.get_position()).magnitude()
-    if distance<100 and v.y>0:
+    if distance<75 and v.y>0:
         ball.velocity=Vector(v.x, -v.y)
 
 

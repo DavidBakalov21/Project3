@@ -6,6 +6,8 @@ class Platform:
         self.actor=Actor('platform.png', center=(300, 550))
     def draw(self):
         self.actor.draw()
+    def get_position(self):
+        return Vector(self.actor.x, self.actor.y)
     def on_mouse_move(self,pos):
        # print(pos)
         self.actor.x=pos[0]
@@ -13,11 +15,14 @@ class Platform:
             self.actor.x=545
         elif self.actor.x<185:
             self.actor.x=185
-class Ball:
+
+class Ball():
     def __init__(self, vector:Vector):
         self.position=vector
         self.velocity=Vector(200,200)
      #   self.acceleration=Vector(5,5)
+
+
     def draw(self):
         screen.draw.filled_circle((self.position.x, self.position.y), RADIUS, "red")
 
@@ -43,6 +48,10 @@ def on_mouse_move(pos):
 
 def update(dt):
     v=ball.velocity
+    distance=(ball.position-platform.get_position()).magnitude()
+    if distance<100 and v.y>0:
+        ball.velocity=Vector(v.x, -v.y)
+
 
 
 
@@ -56,6 +65,7 @@ def update(dt):
         ball.velocity=Vector(-v.x, v.y)
     if ball.position.x<=0 and v.x<0:
         ball.velocity=Vector(-v.x, v.y)
+
 
     ball.position+=Vector(v.x*dt,v.y*dt)
 

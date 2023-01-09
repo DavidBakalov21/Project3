@@ -1,6 +1,7 @@
 import pgzrun
 from Vector import Vector
-RADIUS=25
+
+RADIUS=40
 class EmptyObject:
     def __init__(self, vector:Vector):
         self.position=vector
@@ -11,59 +12,73 @@ class EmptyObject:
         screen.draw.filled_circle((self.position.x, self.position.y), RADIUS, (80,0,70))
 
 class Heatr1:
-    def __init__(self):
-        self.actor=Actor('h.png', center=(0, 0))
+    def __init__(self, x_pose, y_pose):
+        self.x_pose=x_pose
+        self.y_pose=y_pose
+        self.actor=Actor('h.png', center=(self.x_pose, self.y_pose ))
     def draw(self):
         self.actor.draw()
-
-class Heatr2:
-    def __init__(self):
-        self.actor=Actor('h.png', center=(50, 0))
-    def draw(self):
-        self.actor.draw()
-
-class Heatr3:
-    def __init__(self):
-        self.actor=Actor('h.png', center=(100, 0))
-    def draw(self):
-        self.actor.draw()
-
 class Platform:
-    def __init__(self,vector:Vector):
-        self.position=vector
-        self.velocity=Vector(200,200)
-        #self.actor=Actor('platform.png', center=(300, 550))
+    def __init__(self):
+        #self.position=vector
+        #self.velocity=Vector(200,200)
+        self.actor=Actor('plat.png', center=(300, 550))
     def draw(self):
-        screen.draw.filled_rect(Rect((self.position.x, self.position.y),(150,50)), (200, 0, 0))
+        self.actor.draw()
     def get_position(self):
-        return Vector(self.position.x, self.position.y)
+        return Vector(self.actor.x, self.actor.y)
     def on_mouse_move(self,pos):
         #print(pos)
-        self.position.x=pos[0]
-        if self.position.x>649:
-            self.position.x=649
-        elif self.position.x<0:
-            self.position.x=0
+        self.actor.x=pos[0]
+        if self.actor.x>800:
+            self.actor.x=800
+        elif self.actor.x<0:
+            self.actor.x=0
 
 class Ball():
-    def __init__(self, vector:Vector):
-        self.position=vector
-        self.velocity=Vector(400,-400)
+    def __init__(self):
+        # self.position=vector
+        self.actor=Actor('b.png', center=(150,150))
+        self.velocity=Vector(300,-300)
      #   self.acceleration=Vector(5,5)
 
 
     def draw(self):
-        screen.draw.filled_circle((self.position.x, self.position.y), RADIUS, "red")
+        self.actor.draw()
+    def update(self, dt):
+        global HEARTS
+       # print(dt)
+        if self.actor.y+RADIUS>=HEIGHT:
+            obj.remove(obj[HEARTS])
+            HEARTS+=1
+            self.actor.x=150
+            self.actor.y=150
+            print(HEARTS)
+        if self.actor.y  <= 0:
+            print("Y")
+            self.velocity=Vector(self.velocity.x, -self.velocity.y)
+        if self.actor.x + RADIUS >= WIDTH:
+            print("X")
+            self.velocity=Vector(-self.velocity.x, self.velocity.y)
+        if self.actor.x - RADIUS <= 0:
+            print("X")
+            self.velocity=Vector(-self.velocity.x, self.velocity.y)
+
+
+        print(self.velocity)
+        self.actor.x = self.actor.x + self.velocity.x*dt
+        self.actor.y = self.actor.y + self.velocity.y*dt
+        print(self.actor.x, self.actor.y)
 
 WIDTH = 800
 HEIGHT = 600
 HEARTS=0
-platform=Platform(Vector(300, 450))
-ball=Ball(Vector(0,0))
+platform=Platform()
+ball=Ball()
 
-heart1=Heatr1()
-heart2=Heatr2()
-heart3=Heatr3()
+heart1=Heatr1(0,0)
+heart2=Heatr1(50,0)
+heart3=Heatr1(100,0)
 
 # Object to make hearts work
 hh=EmptyObject(Vector(333,-333))
@@ -94,33 +109,21 @@ def update(dt):
 
     global HEARTS
     v=ball.velocity
-    distance=(ball.position-platform.get_position()).magnitude()
-    if distance<90 and v.y>0:
-        ball.velocity=Vector(v.x, -v.y)
+    # distance=(ball.position-platform.get_position()).magnitude()
+   # if distance<90 and v.y>0:
+    #    ball.velocity=Vector(v.x, -v.y)
 
+
+
+    #print("UPD")
 
 
 
     if HEARTS<3:
-        if ball.position.y>=HEIGHT-RADIUS and v.y>0:
-        ##print("Y")
-            #ball.velocity=Vector(v.x, -v.y)
-            obj.remove(obj[HEARTS])
-            HEARTS+=1
-            ball.position.x=0
-            ball.position.y=0
-            print(HEARTS)
-    if ball.position.y<=0 and v.y<0:
-        print("Y")
-        ball.velocity=Vector(v.x, -v.y)
-    if ball.position.x>=WIDTH-RADIUS and v.x>0:
-        ball.velocity=Vector(-v.x, v.y)
-    if ball.position.x<=0 and v.x<0:
-        ball.velocity=Vector(-v.x, v.y)
-
-
-    ball.position+=Vector(v.x*dt,v.y*dt)
+        ball.update(dt)
+    if platform.actor.colliderect(ball.actor):
+        print("YES")
+        ball.velocity = Vector(v.x, -v.y)
 
 
 pgzrun.go()
-

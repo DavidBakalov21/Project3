@@ -1,6 +1,6 @@
 import pgzrun
 from Vector import Vector
-
+import random
 RADIUS=40
 class EmptyObject:
     def __init__(self, x_pose, y_pose, health):
@@ -14,6 +14,18 @@ class EmptyObject:
         self.actor.draw()
     def hit(self):
         self.health-=1
+class Bonus:
+    def __init__(self, pose:Vector):
+        self.position=pose
+        self.actor=Actor('h.png', center=(self.position.x, self.position.y ))
+        self.velocity=Vector(0, 90)
+    def draw(self):
+        self.actor.draw()
+    def move(self,dt):
+        if self.actor.y+RADIUS>=HEIGHT:
+            for HP in bonus:
+                bonus.remove(HP)
+        self.actor.y+=self.velocity.y*dt
 
 class Heatr1:
     def __init__(self, x_pose, y_pose):
@@ -64,7 +76,7 @@ class Ball:
     def __init__(self):
         # self.position=vector
         self.actor=Actor('b.png', center=(150,150))
-        self.velocity=Vector(300,-300)
+        self.velocity=Vector(90,-90)
      #   self.acceleration=Vector(5,5)
 
 
@@ -74,19 +86,19 @@ class Ball:
         global HEARTS
        # print(dt)
         if self.actor.y+RADIUS>=HEIGHT:
-            obj.remove(obj[HEARTS])
-            HEARTS+=1
+
+            HEARTS-=1
             self.actor.x=150
             self.actor.y=150
             print(HEARTS)
         if self.actor.y-RADIUS  <= 0:
-            print("Y")
+         #   print("Y")
             self.velocity=Vector(self.velocity.x, -self.velocity.y)
         if self.actor.x + RADIUS >= WIDTH:
-            print("X")
+           # print("X")
             self.velocity=Vector(-self.velocity.x, self.velocity.y)
         if self.actor.x - RADIUS <= 0:
-            print("X")
+            #print("X")
             self.velocity=Vector(-self.velocity.x, self.velocity.y)
 
 
@@ -97,14 +109,14 @@ class Ball:
 
 WIDTH = 940
 HEIGHT = 450
-HEARTS=0
+HEARTS=1
 SCRORE=0
 platform=Platform()
 ball=Ball()
 
-heart1=Heatr1(0,0)
-heart2=Heatr1(50,0)
-heart3=Heatr1(100,0)
+heart1=Heatr1(30,30)
+heart2=Heatr1(90,30)
+heart3=Heatr1(150,30)
 
 ob1=Obstacle(700, 30,1)
 ob2=Obstacle(300, 100,1)
@@ -117,12 +129,16 @@ ob6=HEAVY_Obstacle(500,300,2)
 hh=EmptyObject(333,-333,1)
 ob=[ob1, ob2,ob3,ob4,ob5, ob6]
 obj=[heart1, heart2, heart3,hh,hh]
+bonus=[]
 #circle=Circle(Vector(200, 200))
 def draw():
     screen.clear()
     screen.fill((80,0,70))
     platform.draw()
     ball.draw()
+
+    for HP in bonus:
+        HP.draw()
 
 
     if SCRORE<6:
@@ -131,10 +147,16 @@ def draw():
     else:
         screen.draw.text("YOU WIN!!", (100, 40), color="orange")
 
-    if HEARTS<3:
-        for el in obj:
-            el.draw()
-    else:
+    if HEARTS>=3:
+        heart1.draw()
+        heart2.draw()
+        heart3.draw()
+    if HEARTS==2:
+        heart1.draw()
+        heart2.draw()
+    if HEARTS==1:
+        heart1.draw()
+    if HEARTS<=0:
         screen.draw.text("GAME OVER", (50, 30), color="orange")
 
 
@@ -151,24 +173,18 @@ def update(dt):
     global HEARTS
     global SCRORE
     global ob
+    global bonus
 
     v=ball.velocity
-    # distance=(ball.position-platform.get_position()).magnitude()
-   # if distance<90 and v.y>0:
-    #    ball.velocity=Vector(v.x, -v.y)
-
-
-
-    #print("UPD")
-
-
-
-
-    if HEARTS<3:
+    if HEARTS>0:
         ball.update(dt)
     if platform.actor.colliderect(ball.actor):
-        print("YES")
         ball.velocity = Vector(v.x, -v.y)
+    for HP in bonus:
+        if platform.actor.colliderect(HP.actor):
+            if HEARTS<3:
+                bonus.remove(HP)
+                HEARTS+=1
 
     for el in ob:
         if ball.actor.colliderect(el.actor):
@@ -178,9 +194,14 @@ def update(dt):
                 ob.remove(el)
                 SCRORE+=1
 
-            print(SCRORE)
+    if random.random()<0.002:
+        position=Vector(random.randint(120,800),30)
+        bonus.append(Bonus(position))
+        print(bonus)
+    for HP in bonus:
+        HP.move(dt)
 
-
+    print(HEARTS)
 
 
 

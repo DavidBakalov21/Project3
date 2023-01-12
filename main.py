@@ -26,6 +26,18 @@ class Bonus:
             for HP in bonus:
                 bonus.remove(HP)
         self.actor.y+=self.velocity.y*dt
+class BonusLenght:
+    def __init__(self, pose:Vector):
+        self.position=pose
+        self.actor=Actor('plus.png', center=(self.position.x, self.position.y ))
+        self.velocity=Vector(0, 90)
+    def draw(self):
+        self.actor.draw()
+    def move(self,dt):
+        if self.actor.y+RADIUS>=HEIGHT:
+            for L in bonusLenght:
+                bonusLenght.remove(L)
+        self.actor.y+=self.velocity.y*dt
 
 class Heatr1:
     def __init__(self, x_pose, y_pose):
@@ -56,10 +68,11 @@ class HEAVY_Obstacle:
     def hit(self):
         self.health-=1
 class Platform:
-    def __init__(self):
+    def __init__(self, img):
+        self.img=img
         #self.position=vector
         #self.velocity=Vector(200,200)
-        self.actor=Actor('plat.png', center=(300, 450))
+        self.actor=Actor(self.img, center=(300, 380))
     def draw(self):
         self.actor.draw()
     def get_position(self):
@@ -111,7 +124,8 @@ WIDTH = 940
 HEIGHT = 450
 HEARTS=1
 SCRORE=0
-platform=Platform()
+LenghtGET=False
+platform=Platform("plat.png")
 ball=Ball()
 
 heart1=Heatr1(30,30)
@@ -130,6 +144,7 @@ hh=EmptyObject(333,-333,1)
 ob=[ob1, ob2,ob3,ob4,ob5, ob6]
 obj=[heart1, heart2, heart3,hh,hh]
 bonus=[]
+bonusLenght=[]
 #circle=Circle(Vector(200, 200))
 def draw():
     screen.clear()
@@ -139,6 +154,8 @@ def draw():
 
     for HP in bonus:
         HP.draw()
+    for L in bonusLenght:
+        L.draw()
 
 
     if SCRORE<6:
@@ -147,7 +164,7 @@ def draw():
     else:
         screen.draw.text("YOU WIN!!", (100, 40), color="orange")
 
-    if HEARTS>=3:
+    if HEARTS==3:
         heart1.draw()
         heart2.draw()
         heart3.draw()
@@ -170,7 +187,7 @@ def on_mouse_move(pos):
 
 def update(dt):
 
-    global HEARTS
+    global HEARTS, platform
     global SCRORE
     global ob
     global bonus
@@ -185,6 +202,12 @@ def update(dt):
             if HEARTS<3:
                 bonus.remove(HP)
                 HEARTS+=1
+    for L in bonusLenght:
+        if platform.actor.colliderect(L.actor):
+            if LenghtGET==False:
+                bonusLenght.remove(L)
+                platform=Platform("platlarge.png")
+
 
     for el in ob:
         if ball.actor.colliderect(el.actor):
@@ -194,12 +217,18 @@ def update(dt):
                 ob.remove(el)
                 SCRORE+=1
 
-    if random.random()<0.002:
+    if random.random()<0.02:
         position=Vector(random.randint(120,800),30)
         bonus.append(Bonus(position))
         print(bonus)
+    if random.random()<0.002:
+        position=Vector(random.randint(120,800),30)
+        bonusLenght.append(BonusLenght(position))
+        print(bonusLenght)
     for HP in bonus:
         HP.move(dt)
+    for L in bonusLenght:
+        L.move(dt)
 
     print(HEARTS)
 

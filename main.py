@@ -1,7 +1,10 @@
 import pgzrun
 from Vector import Vector
 import random
+import threading
+import time
 RADIUS=40
+
 class EmptyObject:
     def __init__(self, x_pose, y_pose, health):
         self.x_pose=x_pose
@@ -103,7 +106,7 @@ class Ball:
             HEARTS-=1
             self.actor.x=150
             self.actor.y=150
-            print(HEARTS)
+            #print(HEARTS)
         if self.actor.y-RADIUS  <= 0:
          #   print("Y")
             self.velocity=Vector(self.velocity.x, -self.velocity.y)
@@ -175,22 +178,24 @@ def draw():
         heart1.draw()
     if HEARTS<=0:
         screen.draw.text("GAME OVER", (50, 30), color="orange")
-
-
-
-
-
 def on_mouse_move(pos):
     platform.on_mouse_move(pos)
 
+def sleeep():
+    global LenghtGET, platform
+    time.sleep(5)
+    LenghtGET=False
+    platform=Platform("plat.png")
+    print("sdcsddsdcsdc")
 
 
 def update(dt):
 
-    global HEARTS, platform
+    global HEARTS, platform, LenghtGET
     global SCRORE
     global ob
     global bonus
+    global start_time
 
     v=ball.velocity
     if HEARTS>0:
@@ -206,9 +211,10 @@ def update(dt):
         if platform.actor.colliderect(L.actor):
             if LenghtGET==False:
                 bonusLenght.remove(L)
+                LenghtGET=True
                 platform=Platform("platlarge.png")
-
-
+                thr=threading.Thread(target=sleeep, name="thr1")
+                thr.start()
     for el in ob:
         if ball.actor.colliderect(el.actor):
             ball.velocity = Vector(-v.x, -v.y)
@@ -217,7 +223,7 @@ def update(dt):
                 ob.remove(el)
                 SCRORE+=1
 
-    if random.random()<0.02:
+    if random.random()<0.002:
         position=Vector(random.randint(120,800),30)
         bonus.append(Bonus(position))
         print(bonus)
@@ -230,10 +236,5 @@ def update(dt):
     for L in bonusLenght:
         L.move(dt)
 
-    print(HEARTS)
-
-
-
-
-
+    #print(HEARTS)
 pgzrun.go()

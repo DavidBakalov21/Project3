@@ -5,6 +5,17 @@ import threading
 import time
 RADIUS=40
 
+class RectOBJ:
+    def __init__(self,x_Pose, y_Pose, health):
+        self.health=health
+        self.x_Pose=x_Pose
+        self.y_Pose=y_Pose
+        self.actor=Actor('rect.png', center=(self.x_Pose, self.y_Pose ))
+    def draw(self):
+        self.actor.draw()
+    def hit(self):
+        self.health-=1
+
 class EmptyObject:
     def __init__(self, x_pose, y_pose, health):
         self.x_pose=x_pose
@@ -152,11 +163,12 @@ ob9=HEAVY_Obstacle(100,100,2)
 ob10=HEAVY_Obstacle(150,100,2)
 ob11=HEAVY_Obstacle(600,100,2)
 ob12=HEAVY_Obstacle(800,100,2)
+ob13=RectOBJ(800,100,1)
 
 
 # Object to make hearts work
 hh=EmptyObject(333,-333,1)
-ob=[ob1, ob2,ob3,ob4,ob5, ob6, ob7, ob8, ob9, ob10, ob11, ob12]
+ob=[ob1, ob2,ob3,ob4,ob5, ob6, ob7, ob8, ob9, ob10, ob11, ob12, ob13]
 obj=[heart1, heart2, heart3,hh,hh]
 bonus=[]
 bonusLenght=[]

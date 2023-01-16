@@ -89,10 +89,12 @@ class Platform:
             self.actor.x=0
 
 class Ball:
-    def __init__(self):
+    def __init__(self,x,y):
         # self.position=vector
         self.actor=Actor('b.png', center=(150,150))
-        self.velocity=Vector(90,-90)
+        self.y=y
+        self.x=x
+        self.velocity=Vector(self.x,-self.y)
      #   self.acceleration=Vector(5,5)
 
 
@@ -127,9 +129,12 @@ WIDTH = 940
 HEIGHT = 450
 HEARTS=1
 SCRORE=0
+VX=90
+VY=-90
 LenghtGET=False
+FASTER=True
 platform=Platform("plat.png")
-ball=Ball()
+ball=Ball(VX, VY)
 
 heart1=Heatr1(30,30)
 heart2=Heatr1(90,30)
@@ -188,10 +193,19 @@ def sleeep():
     platform=Platform("plat.png")
     print("sdcsddsdcsdc")
 
+def faaaaster():
+    global ball, FASTER
+
+    time.sleep(10)
+    v=ball.velocity
+    ball.velocity=Vector(v.x*1.3, v.y*1.3)
+    FASTER=True
+    print("Faaaaasta")
+
 
 def update(dt):
 
-    global HEARTS, platform, LenghtGET
+    global HEARTS, platform, LenghtGET, FASTER
     global SCRORE
     global ob
     global bonus
@@ -235,6 +249,11 @@ def update(dt):
         HP.move(dt)
     for L in bonusLenght:
         L.move(dt)
+    if FASTER==True:
+        thr2=threading.Thread(target=faaaaster, name="thr2")
+        thr2.start()
+        FASTER=False
+
 
     #print(HEARTS)
 pgzrun.go()

@@ -1,10 +1,7 @@
 import pgzrun
 from Vector import Vector
 import random
-import threading
-import time
 RADIUS=40
-
 class EmptyObject:
     def __init__(self, x_pose, y_pose, health):
         self.x_pose=x_pose
@@ -89,12 +86,10 @@ class Platform:
             self.actor.x=0
 
 class Ball:
-    def __init__(self,x,y):
+    def __init__(self):
         # self.position=vector
         self.actor=Actor('b.png', center=(150,150))
-        self.y=y
-        self.x=x
-        self.velocity=Vector(self.x,-self.y)
+        self.velocity=Vector(90,-90)
      #   self.acceleration=Vector(5,5)
 
 
@@ -108,7 +103,7 @@ class Ball:
             HEARTS-=1
             self.actor.x=150
             self.actor.y=150
-            #print(HEARTS)
+            print(HEARTS)
         if self.actor.y-RADIUS  <= 0:
          #   print("Y")
             self.velocity=Vector(self.velocity.x, -self.velocity.y)
@@ -129,12 +124,9 @@ WIDTH = 940
 HEIGHT = 450
 HEARTS=1
 SCRORE=0
-VX=90
-VY=-90
 LenghtGET=False
-FASTER=True
 platform=Platform("plat.png")
-ball=Ball(VX, VY)
+ball=Ball()
 
 heart1=Heatr1(30,30)
 heart2=Heatr1(90,30)
@@ -183,33 +175,22 @@ def draw():
         heart1.draw()
     if HEARTS<=0:
         screen.draw.text("GAME OVER", (50, 30), color="orange")
+
+
+
+
+
 def on_mouse_move(pos):
     platform.on_mouse_move(pos)
 
-def sleeep():
-    global LenghtGET, platform
-    time.sleep(5)
-    LenghtGET=False
-    platform=Platform("plat.png")
-    print("sdcsddsdcsdc")
-
-def faaaaster():
-    global ball, FASTER
-
-    time.sleep(10)
-    v=ball.velocity
-    ball.velocity=Vector(v.x*1.3, v.y*1.3)
-    FASTER=True
-    print("Faaaaasta")
 
 
 def update(dt):
 
-    global HEARTS, platform, LenghtGET, FASTER
+    global HEARTS, platform
     global SCRORE
     global ob
     global bonus
-    global start_time
 
     v=ball.velocity
     if HEARTS>0:
@@ -225,10 +206,9 @@ def update(dt):
         if platform.actor.colliderect(L.actor):
             if LenghtGET==False:
                 bonusLenght.remove(L)
-                LenghtGET=True
                 platform=Platform("platlarge.png")
-                thr=threading.Thread(target=sleeep, name="thr1")
-                thr.start()
+
+
     for el in ob:
         if ball.actor.colliderect(el.actor):
             ball.velocity = Vector(-v.x, -v.y)
@@ -237,7 +217,7 @@ def update(dt):
                 ob.remove(el)
                 SCRORE+=1
 
-    if random.random()<0.002:
+    if random.random()<0.02:
         position=Vector(random.randint(120,800),30)
         bonus.append(Bonus(position))
         print(bonus)
@@ -249,11 +229,11 @@ def update(dt):
         HP.move(dt)
     for L in bonusLenght:
         L.move(dt)
-    if FASTER==True:
-        thr2=threading.Thread(target=faaaaster, name="thr2")
-        thr2.start()
-        FASTER=False
+
+    print(HEARTS)
 
 
-    #print(HEARTS)
+
+
+
 pgzrun.go()
